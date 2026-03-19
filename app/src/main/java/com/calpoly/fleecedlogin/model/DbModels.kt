@@ -3,7 +3,7 @@ package com.calpoly.fleecedlogin.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-// === DB row models for Supabase ===
+// DB row models for Supabase
 
 @Serializable
 data class DbPoll(

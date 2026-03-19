@@ -24,10 +24,7 @@ val TomorrowFontFamily = FontFamily(
     Font(googleFont = tomorrowFont, fontProvider = provider, weight = FontWeight.Bold),
 )
 
-// Keep alias so any screens still referencing PixelFontFamily compile
-val PixelFontFamily = TomorrowFontFamily
-
-// Display font for the Polls screen — Barlow Condensed ExtraBold Italic
+// Display font for the polls screen
 private val barlowCondensedFont = GoogleFont("Barlow Condensed")
 
 val BarlowCondensedFamily = FontFamily(

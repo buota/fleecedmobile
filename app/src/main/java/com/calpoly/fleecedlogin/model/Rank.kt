@@ -9,9 +9,9 @@ enum class Rank(val title: String, val minPoints: Int) {
     HALL_OF_FAMER("Hall of Famer", 750)
 }
 
-// Special positional ranks awarded by leaderboard position
+// Special ranks awarded by leaderboard position
 const val RANK_MVP = "MVP"       // #1 on Seasonal leaderboard
-const val RANK_GOAT = "GOAT"     // #1 on All Time leaderboard (overrides MVP)
+const val RANK_GOAT = "GOAT"     // #1 on All Time leaderboard
 
 fun getRankForPoints(points: Int): Rank {
     return Rank.entries.lastOrNull { points >= it.minPoints } ?: Rank.ROOKIE

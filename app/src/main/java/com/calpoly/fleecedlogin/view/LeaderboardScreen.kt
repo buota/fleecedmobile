@@ -52,7 +52,7 @@ fun LeaderboardScreen(
     var isRefreshing by remember { mutableStateOf(false) }
 
     val tabs = listOf(
-        LeaderboardTab.WEEKLY   to "WEEKLY",
+        LeaderboardTab.WEEKLY to "WEEKLY",
         LeaderboardTab.SEASONAL to "SEASONAL",
         LeaderboardTab.ALL_TIME to "ALL TIME"
     )
@@ -153,7 +153,6 @@ fun LeaderboardScreen(
                         }
                     }
                 }
-
                 // Bottom padding
                 item { Spacer(modifier = Modifier.height(8.dp)) }
             }

@@ -77,9 +77,7 @@ import com.calpoly.fleecedlogin.viewmodel.HomeViewModel
 import com.calpoly.fleecedlogin.viewmodel.VoteHistoryPoint
 import kotlin.math.roundToInt
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Shared header banner — used on every screen
-// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun FleecedScreenHeader(title: String = "FLEECED") {
     Box(
@@ -102,20 +100,19 @@ fun FleecedScreenHeader(title: String = "FLEECED") {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Polls screen design tokens (scoped to this file)
-// ─────────────────────────────────────────────────────────────────────────────
-private val PollsBgDeep      = Color(0xFF0D1B2A)
-private val PollsBgSurface   = Color(0xFF1A2740)
-private val PollsBgElevated  = Color(0xFF243350)
-private val PollsAccentBlue  = Color(0xFF5B7FD4)
-private val PollsGreen       = Color(0xFF3D8B40)
-private val PollsRed         = Color(0xFFC0392B)
+
+// Polls screen design tokens
+private val PollsBgDeep = Color(0xFF0D1B2A)
+private val PollsBgSurface = Color(0xFF1A2740)
+private val PollsBgElevated = Color(0xFF243350)
+private val PollsAccentBlue = Color(0xFF5B7FD4)
+private val PollsGreen = Color(0xFF3D8B40)
+private val PollsRed = Color(0xFFC0392B)
 private val PollsGreenBright = Color(0xFF4CAF50)
-private val PollsRedBright   = Color(0xFFE53935)
-private val PollsTextMuted   = Color(0xFFA0B0C8)
-private val PollsBorder      = Color(0xFF3A5080)
-private val PollsPill        = Color(0xFF2A3A55)
+private val PollsRedBright = Color(0xFFE53935)
+private val PollsTextMuted = Color(0xFFA0B0C8)
+private val PollsBorder = Color(0xFF3A5080)
+private val PollsPill = Color(0xFF2A3A55)
 
 @Composable
 private fun YourPickBadge(
@@ -150,9 +147,6 @@ private fun YourPickBadge(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Mock poll data — demo cards rendered when no real posts exist
-// ─────────────────────────────────────────────────────────────────────────────
 private data class MockPollData(
     val leftName: String,
     val leftVotes: Int,
@@ -164,13 +158,6 @@ private data class MockPollData(
     val rightFp: String,
     val badge: String? = null,      // "CORRECT", "INCORRECT", or null
     val leftIsWinner: Boolean = true // true → left=green, right=red
-)
-
-private val mockPolls = listOf(
-    MockPollData("Patrick Mahomes", 0, 0,   "18.2 FP", "Josh Allen", 1, 100, "14.9 FP", null,        true),
-    MockPollData("Chris Olave",     2, 67,  "24.1 FP", "AJ Brown",   1, 33,  "10.3 FP", "CORRECT",   true),
-    MockPollData("J Gibbs",         1, 33,  "12.2 FP", "A Jones",    2, 67,  "8.5 FP",  "INCORRECT", false),
-    MockPollData("J Gibbs",         1, 100, "12.2 FP", "A Jones",    0, 0,   "8.5 FP",  "CORRECT",   true)
 )
 
 private fun voteChartLabel(option: PollOption, postType: PostType): String {
@@ -232,7 +219,6 @@ private fun TeamJerseyIcon(
             .bufferedReader()
             .use { it.readText() }
     }
-    // Keep the two panel colors close so it reads as a natural fabric shadow.
     val jerseyLight = remember(teamColor) { blend(teamColor, Color.White, 0.08f) }
     val jerseyDark = remember(teamColor) { blend(teamColor, Color.Black, 0.12f) }
     val themedSvgBytes = remember(svgTemplate, jerseyLight, jerseyDark) {
@@ -281,9 +267,7 @@ private fun TeamJerseyIcon(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Home Screen — Polls Feed
-// ─────────────────────────────────────────────────────────────────────────────
+// Polls Feed
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -304,7 +288,7 @@ fun HomeScreen(
 
     Scaffold(
         containerColor = PollsBgDeep,
-        // ── Bottom nav ─────────────────────────────────────────────────────
+        // Bottom nav
         bottomBar = {
             FleecedBottomNav(
                 selectedItem = selectedItem,
@@ -332,7 +316,7 @@ fun HomeScreen(
                     .background(PollsBgDeep),
                 contentPadding = PaddingValues(bottom = 12.dp)
             ) {
-                // ── [B] POLLS header banner ────────────────────────────────
+                // POLLS header banner
                 item {
                     Box(
                         modifier = Modifier
@@ -357,7 +341,7 @@ fun HomeScreen(
                     }
                 }
 
-                // ── [C] Poll type toggle ───────────────────────────────────
+                // Poll type toggle
                 item {
                     Row(
                         modifier = Modifier
@@ -380,7 +364,7 @@ fun HomeScreen(
                     }
                 }
 
-                // ── [D] Filter dropdowns ───────────────────────────────────
+                // Filter dropdowns
                 item {
                     Row(
                         modifier = Modifier
@@ -407,7 +391,7 @@ fun HomeScreen(
                     }
                 }
 
-                // ── [E] Poll feed ──────────────────────────────────────────
+                // Poll feed
                 // uiState.posts: type-filtered → week-filtered (trades bypass week) → sorted
                 if (visiblePosts.isNotEmpty()) {
                     items(visiblePosts, key = { it.id }) { post ->
@@ -441,7 +425,7 @@ fun HomeScreen(
                         }
                     }
                 } else if (uiState.totalPostsCount == 0) {
-                    // ── [F] No posts loaded from DB ────────────────────────
+                    // No posts loaded from DB
                     item {
                         Box(
                             modifier = Modifier
@@ -472,7 +456,7 @@ fun HomeScreen(
                         }
                     }
                 } else if (uiState.typePostsCount == 0) {
-                    // ── [G] Posts exist but none of this type ──────────────
+                    // Posts exist but none of this type
                     item {
                         Box(
                             modifier = Modifier
@@ -489,7 +473,7 @@ fun HomeScreen(
                         }
                     }
                 } else {
-                    // ── [H] Posts exist, but none match the currently visible poll card shape ──
+                    // Posts exist, but none match the currently visible poll card shape
                     item {
                         Box(
                             modifier = Modifier
@@ -511,7 +495,7 @@ fun HomeScreen(
         }
     }
 
-    // Fetch fresh comments + vote history from DB whenever a dialog opens
+    // Fetch fresh comments + vote history from DB
     LaunchedEffect(selectedPostId) {
         selectedPostId?.let {
             viewModel.loadCommentsForPost(it)
@@ -519,9 +503,9 @@ fun HomeScreen(
         }
     }
 
-    // Post detail dialog (full-screen).
-    // Prefer the filtered-list entry so vote updates are reactive; fall back to the
-    // full backing list so the dialog stays open when the user changes type/week filters.
+    // Post detail dialog
+    // Prefer the filtered-list entry so vote updates are reactive, fall back to the
+    // full backing list so the dialog stays open when the user changes type/week filters
     selectedPostId?.let { postId ->
         val post = uiState.posts.find { it.id == postId } ?: viewModel.getPostById(postId)
         post?.let {
@@ -546,9 +530,7 @@ fun HomeScreen(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Poll Card — maps a real Post to the two-half design
-// ─────────────────────────────────────────────────────────────────────────────
+// Poll Card
 @Composable
 fun PollCard(
     post: Post,
@@ -558,34 +540,34 @@ fun PollCard(
     val pollData = post.pollData ?: return
     if (pollData.options.size < 2) return
 
-    val leftOption  = pollData.options[0]
+    val leftOption = pollData.options[0]
     val rightOption = pollData.options[1]
-    val hasVoted    = pollData.userVote != null
-    val isClosed    = pollData.status == "closed"
-    val isResolved  = isClosed && pollData.correctOptionId != null
+    val hasVoted = pollData.userVote != null
+    val isClosed = pollData.status == "closed"
+    val isResolved = isClosed && pollData.correctOptionId != null
     val userVotedCorrectly = isResolved && pollData.userVote == pollData.correctOptionId
     val userVotedIncorrectly = isResolved && pollData.userVote != null && pollData.userVote != pollData.correctOptionId
-    val votedLeft   = hasVoted && pollData.userVote == leftOption.id
-    val votedRight  = hasVoted && pollData.userVote == rightOption.id
+    val votedLeft = hasVoted && pollData.userVote == leftOption.id
+    val votedRight = hasVoted && pollData.userVote == rightOption.id
 
-    // Green/red only for closed polls; neutral accent blue for open voted polls
+    // Green/red only for closed polls, neutral accent blue for open voted polls
     val leftIsWinner = when {
         isResolved -> pollData.correctOptionId == leftOption.id
-        else       -> leftOption.votePercentage >= rightOption.votePercentage
+        else -> leftOption.votePercentage >= rightOption.votePercentage
     }
     val leftBg = when {
-        isClosed            -> if (leftIsWinner) PollsGreen else PollsRed
+        isClosed -> if (leftIsWinner) PollsGreen else PollsRed
         !votedRight && hasVoted -> PollsAccentBlue.copy(alpha = 0.5f)
-        votedRight          -> PollsBgElevated.copy(alpha = 0.5f)
-        else                -> PollsBgElevated
+        votedRight -> PollsBgElevated.copy(alpha = 0.5f)
+        else -> PollsBgElevated
     }
     val rightBg = when {
-        isClosed   -> if (!leftIsWinner) PollsGreen else PollsRed
+        isClosed -> if (!leftIsWinner) PollsGreen else PollsRed
         votedRight -> PollsAccentBlue.copy(alpha = 0.5f)
-        hasVoted   -> PollsBgElevated.copy(alpha = 0.5f)
-        else       -> PollsBgElevated
+        hasVoted -> PollsBgElevated.copy(alpha = 0.5f)
+        else -> PollsBgElevated
     }
-    val leftFpColor  = if (isClosed && leftIsWinner) PollsGreenBright else if (isClosed) PollsRedBright else PollsAccentBlue
+    val leftFpColor = if (isClosed && leftIsWinner) PollsGreenBright else if (isClosed) PollsRedBright else PollsAccentBlue
     val rightFpColor = if (isClosed && !leftIsWinner) PollsGreenBright else if (isClosed) PollsRedBright else PollsAccentBlue
 
     fun playerLabel(opt: PollOption): String =
@@ -611,7 +593,7 @@ fun PollCard(
             border = BorderStroke(1.dp, PollsBorder)
         ) {
             Column {
-                // ── Voting halves ─────────────────────────────────────────
+                // Voting halves
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -670,13 +652,13 @@ fun PollCard(
                             Box(modifier = Modifier.align(Alignment.Center)) {
                                 PollHalfContent(
                                     playerName = playerLabel(rightOption),
-                                    imageUrl   = playerImageUrl(rightOption),
+                                    imageUrl = playerImageUrl(rightOption),
                                     useTeamJersey = useTeamJersey,
                                     jerseyColor = playerTeamColor(rightOption),
-                                    votes     = rightOption.voteCount,
-                                    pct       = rightOption.votePercentage.toInt(),
-                                    fpText    = if (isResolved) pollData.player2Points?.let { "${it} FP" } else null,
-                                    fpColor   = rightFpColor
+                                    votes = rightOption.voteCount,
+                                    pct = rightOption.votePercentage.toInt(),
+                                    fpText = if (isResolved) pollData.player2Points?.let { "${it} FP" } else null,
+                                    fpColor = rightFpColor
                                 )
                             }
                             if (votedRight) {
@@ -688,7 +670,7 @@ fun PollCard(
                     }
                 }
 
-                // ── Footer (tappable via outer Surface's onClick) ─────────
+                // Footer
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -751,9 +733,8 @@ fun PollCard(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Trade Feed Card — two-column GIVE | RECEIVE layout, supports multiple players
-// ─────────────────────────────────────────────────────────────────────────────
+// Trade Feed Card
+
 @Composable
 fun TradeFeedCard(
     post: Post,
@@ -761,46 +742,46 @@ fun TradeFeedCard(
     onVote: (String) -> Unit
 ) {
     val pollData = post.pollData ?: return
-    val giveOpt    = pollData.options.find { it.side == TradeSide.GIVE }
+    val giveOpt = pollData.options.find { it.side == TradeSide.GIVE }
                   ?: pollData.options.getOrNull(0) ?: return
     val receiveOpt = pollData.options.find { it.side == TradeSide.RECEIVE }
                   ?: pollData.options.getOrNull(1) ?: return
 
-    val hasVoted     = pollData.userVote != null
-    val isClosed     = pollData.status == "closed"
-    val votedGive    = hasVoted && pollData.userVote == giveOpt.id
+    val hasVoted = pollData.userVote != null
+    val isClosed = pollData.status == "closed"
+    val votedGive = hasVoted && pollData.userVote == giveOpt.id
     val votedReceive = hasVoted && pollData.userVote == receiveOpt.id
     val giveIsWinner = giveOpt.votePercentage >= receiveOpt.votePercentage
 
     val giveBg = when {
-        isClosed     -> if (giveIsWinner) PollsGreen else PollsRed
-        votedGive    -> PollsAccentBlue.copy(alpha = 0.5f)
-        hasVoted     -> PollsBgElevated.copy(alpha = 0.5f)
-        else         -> PollsBgElevated
+        isClosed -> if (giveIsWinner) PollsGreen else PollsRed
+        votedGive -> PollsAccentBlue.copy(alpha = 0.5f)
+        hasVoted -> PollsBgElevated.copy(alpha = 0.5f)
+        else -> PollsBgElevated
     }
     val receiveBg = when {
-        isClosed     -> if (!giveIsWinner) PollsGreen else PollsRed
+        isClosed -> if (!giveIsWinner) PollsGreen else PollsRed
         votedReceive -> PollsAccentBlue.copy(alpha = 0.5f)
-        hasVoted     -> PollsBgElevated.copy(alpha = 0.5f)
-        else         -> PollsBgElevated
+        hasVoted -> PollsBgElevated.copy(alpha = 0.5f)
+        else -> PollsBgElevated
     }
     val giveLabelColor = when {
-        isClosed     -> Color.White.copy(alpha = 0.75f)
-        votedGive    -> PollsAccentBlue
-        else         -> PollsTextMuted
+        isClosed -> Color.White.copy(alpha = 0.75f)
+        votedGive -> PollsAccentBlue
+        else -> PollsTextMuted
     }
     val receiveLabelColor = when {
-        isClosed     -> Color.White.copy(alpha = 0.75f)
+        isClosed -> Color.White.copy(alpha = 0.75f)
         votedReceive -> PollsAccentBlue
-        else         -> PollsTextMuted
+        else -> PollsTextMuted
     }
     val giveBarColor = when {
         isClosed -> if (giveIsWinner) PollsGreenBright else PollsRedBright
-        else     -> PollsAccentBlue
+        else -> PollsAccentBlue
     }
     val receiveBarColor = when {
         isClosed -> if (!giveIsWinner) PollsGreenBright else PollsRedBright
-        else     -> PollsAccentBlue
+        else -> PollsAccentBlue
     }
 
     Surface(
@@ -818,7 +799,7 @@ fun TradeFeedCard(
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
         ) {
-            // ── GIVE side ─────────────────────────────────────────────────
+            // Give side
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -878,7 +859,7 @@ fun TradeFeedCard(
                 }
             }
 
-            // ── Divider ───────────────────────────────────────────────────
+            // Divider
             Box(
                 modifier = Modifier
                     .width(1.5.dp)
@@ -886,7 +867,7 @@ fun TradeFeedCard(
                     .background(PollsBgDeep)
             )
 
-            // ── RECEIVE side ──────────────────────────────────────────────
+            // Recieve side
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -946,7 +927,7 @@ fun TradeFeedCard(
                 }
             }
         }
-        // ── Footer (tappable via outer Surface's onClick) ─────────────
+        // Footer
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -971,120 +952,7 @@ fun TradeFeedCard(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Mock Poll Card — hardcoded demo cards with badge support
-// ─────────────────────────────────────────────────────────────────────────────
-@Composable
-private fun MockPollCard(data: MockPollData) {
-    val leftBg       = if (data.leftIsWinner) PollsGreen      else PollsRed
-    val rightBg      = if (data.leftIsWinner) PollsRed        else PollsGreen
-    val leftFpColor  = if (data.leftIsWinner) PollsGreenBright else PollsRedBright
-    val rightFpColor = if (data.leftIsWinner) PollsRedBright  else PollsGreenBright
-
-    val badgeColor = when (data.badge) {
-        "CORRECT"   -> PollsGreenBright
-        "INCORRECT" -> PollsRedBright
-        else        -> null
-    }
-    val badgeText = when (data.badge) {
-        "CORRECT"   -> "CORRECT +10"
-        "INCORRECT" -> "INCORRECT"
-        else        -> null
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-    ) {
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            color = PollsBgSurface,
-            border = BorderStroke(1.dp, PollsBorder)
-        ) {
-            Box {
-                // Two-half split row
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Min)
-                ) {
-                    // Left half
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .background(leftBg)
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        PollHalfContent(
-                            playerName = data.leftName,
-                            votes      = data.leftVotes,
-                            pct        = data.leftPct,
-                            fpText     = data.leftFp,
-                            fpColor    = leftFpColor
-                        )
-                    }
-
-                    // Divider
-                    Box(
-                        modifier = Modifier
-                            .width(1.5.dp)
-                            .fillMaxHeight()
-                            .background(PollsBgDeep)
-                    )
-
-                    // Right half
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .background(rightBg)
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        PollHalfContent(
-                            playerName = data.rightName,
-                            votes      = data.rightVotes,
-                            pct        = data.rightPct,
-                            fpText     = data.rightFp,
-                            fpColor    = rightFpColor
-                        )
-                    }
-                }
-
-                // Status badge — overlaid at top-center
-                if (badgeText != null && badgeColor != null) {
-                    Surface(
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .padding(top = 8.dp),
-                        shape = RoundedCornerShape(6.dp),
-                        color = PollsBgDeep,
-                        border = BorderStroke(1.5.dp, badgeColor)
-                    ) {
-                        Text(
-                            text = badgeText,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                letterSpacing = 0.5.sp
-                            ),
-                            fontWeight = FontWeight.Bold,
-                            color = badgeColor,
-                            fontSize = 10.sp
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Poll half content — avatar • votes/pct • FP • player name
-// ─────────────────────────────────────────────────────────────────────────────
+// Poll half content
 @Composable
 private fun PollHalfContent(
     playerName: String,
@@ -1100,7 +968,7 @@ private fun PollHalfContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        // Start/Sit: always show the shared jersey SVG tinted to team color.
+        // Start/Sit: always show the shared jersey SVG tinted to team color
         if (useTeamJersey) {
             TeamJerseyIcon(
                 teamColor = jerseyColor,
@@ -1108,7 +976,7 @@ private fun PollHalfContent(
                 contentDescription = "$playerName jersey"
             )
         } else if (imageUrl != null) {
-            // Other post types: player image asset with fallback icon.
+            // Other post types: player image asset with fallback icon
             SubcomposeAsyncImage(
                 model = imageUrl,
                 contentDescription = playerName,
@@ -1172,7 +1040,7 @@ private fun PollHalfContent(
             )
         }
 
-        // FP label (optional)
+        // FP label
         fpText?.let {
             Text(
                 text = it,
@@ -1198,9 +1066,7 @@ private fun PollHalfContent(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Poll type toggle pill
-// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 private fun PollTypeToggle(
     label: String,
@@ -1227,10 +1093,7 @@ private fun PollTypeToggle(
         }
     }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Filter dropdown pill — tappable, shows a DropdownMenu with options
-// ─────────────────────────────────────────────────────────────────────────────
+// Filter dropdown pill — shows a dropdown menu with options
 @Composable
 private fun FilterDropdownPill(
     label: String,
@@ -1307,9 +1170,7 @@ private fun FilterDropdownPill(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Bottom Nav
-// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun FleecedBottomNav(
     selectedItem: Int,
@@ -1360,9 +1221,7 @@ fun FleecedBottomNav(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Rank Badge
-// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun RankBadge(rank: String) {
     val bg = when (rank) {
@@ -1397,21 +1256,19 @@ fun RankBadge(rank: String) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Post Type Badge
-// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun PostTypeBadge(postType: PostType) {
     if (postType == PostType.GENERAL) return
     val (bg, border, text) = when (postType) {
-        PostType.TRADE     -> Triple(LightPurple.copy(alpha = 0.2f), LightPurple.copy(alpha = 0.6f), LightPurple)
+        PostType.TRADE -> Triple(LightPurple.copy(alpha = 0.2f), LightPurple.copy(alpha = 0.6f), LightPurple)
         PostType.START_SIT -> Triple(RetroPurple.copy(alpha = 0.2f), RetroPurple.copy(alpha = 0.6f), RetroPurple)
-        else               -> Triple(Sage.copy(alpha = 0.1f), Sage.copy(alpha = 0.3f), Sage)
+        else -> Triple(Sage.copy(alpha = 0.1f), Sage.copy(alpha = 0.3f), Sage)
     }
     val label = when (postType) {
-        PostType.TRADE     -> "TRADE"
+        PostType.TRADE -> "TRADE"
         PostType.START_SIT -> "START / SIT"
-        else               -> ""
+        else -> ""
     }
     Surface(
         shape = RoundedCornerShape(20.dp),
@@ -1427,175 +1284,17 @@ fun PostTypeBadge(postType: PostType) {
         )
     }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Feed Post Card (legacy — kept for backward compat)
-// ─────────────────────────────────────────────────────────────────────────────
-@Composable
-fun HomeFeedPostCard(
-    post: Post,
-    onVote: (String) -> Unit,
-    onUpvote: () -> Unit,
-    onDownvote: () -> Unit,
-    onComment: (String) -> Unit,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = DarkSurface),
-        border = BorderStroke(1.dp, RetroPurple.copy(alpha = 0.25f))
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            // Type badge + timestamp
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                PostTypeBadge(postType = post.postType)
-                Text(
-                    text = getRelativeTimeString(post.createdAt),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Sage
-                )
-            }
-
-            // Username + rank badges
-            if (post.username.isNotBlank()) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "@${post.username}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Sage
-                    )
-                    post.userRanks.forEach { rank -> RankBadge(rank = rank) }
-                }
-            }
-
-            // Poll sections
-            post.pollData?.let { pollData ->
-                when (post.postType) {
-                    PostType.TRADE     -> TradeVotingSection(pollData = pollData, onVote = onVote, isClosed = pollData.status == "closed")
-                    PostType.START_SIT -> StartSitVotingSection(pollData = pollData, onVote = onVote, isClosed = pollData.status == "closed")
-                    else               -> {}
-                }
-            }
-
-            HorizontalDivider(
-                color = RetroPurple.copy(alpha = 0.12f),
-                thickness = 1.dp
-            )
-
-            // Footer row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Upvote
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .clickable(onClick = onUpvote)
-                        .padding(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = if (post.userVoteType == VoteType.UP) Icons.Filled.ThumbUp else Icons.Outlined.ThumbUp,
-                        contentDescription = "Upvote",
-                        modifier = Modifier.size(15.dp),
-                        tint = if (post.userVoteType == VoteType.UP) RetroPurple else Sage
-                    )
-                    Text(
-                        text = "${post.upvotes}",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = if (post.userVoteType == VoteType.UP) RetroPurple else Sage
-                    )
-                }
-
-                // Downvote
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .clickable(onClick = onDownvote)
-                        .padding(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = if (post.userVoteType == VoteType.DOWN) Icons.Filled.ThumbDown else Icons.Outlined.ThumbDown,
-                        contentDescription = "Downvote",
-                        modifier = Modifier.size(15.dp),
-                        tint = if (post.userVoteType == VoteType.DOWN) VoteRed else Sage
-                    )
-                    Text(
-                        text = "${post.downvotes}",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = if (post.userVoteType == VoteType.DOWN) VoteRed else Sage
-                    )
-                }
-
-                // Comments
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .clickable(onClick = onClick)
-                        .padding(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.ModeComment,
-                        contentDescription = "Comments",
-                        modifier = Modifier.size(15.dp),
-                        tint = Sage
-                    )
-                    Text(
-                        text = "${post.commentCount}",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = Sage
-                    )
-                }
-
-                // Vote count for polls
-                post.pollData?.let { pd ->
-                    Text(
-                        text = "${pd.totalVotes} votes",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Sage.copy(alpha = 0.6f)
-                    )
-                }
-            }
-        }
-    }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Trade Voting
-// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun TradeVotingSection(
     pollData: com.calpoly.fleecedlogin.model.PollData,
     onVote: (String) -> Unit,
     isClosed: Boolean = false
 ) {
-    val giveOption    = pollData.options.find { it.side == TradeSide.GIVE }
+    val giveOption = pollData.options.find { it.side == TradeSide.GIVE }
     val receiveOption = pollData.options.find { it.side == TradeSide.RECEIVE }
-    val hasVoted      = pollData.userVote != null
-    val giveIsWinner  = (giveOption?.votePercentage ?: 0f) >= (receiveOption?.votePercentage ?: 0f)
+    val hasVoted = pollData.userVote != null
+    val giveIsWinner = (giveOption?.votePercentage ?: 0f) >= (receiveOption?.votePercentage ?: 0f)
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -1603,25 +1302,25 @@ fun TradeVotingSection(
     ) {
         giveOption?.let { option ->
             TradeOptionCard(
-                title    = "GIVE",
-                option   = option,
+                title = "GIVE",
+                option = option,
                 isSelected = pollData.userVote == option.id,
                 hasVoted = hasVoted,
                 isClosed = isClosed,
                 isWinner = isClosed && giveIsWinner,
-                onVote   = { onVote(option.id) },
+                onVote = { onVote(option.id) },
                 modifier = Modifier.weight(1f)
             )
         }
         receiveOption?.let { option ->
             TradeOptionCard(
-                title    = "GET",
-                option   = option,
+                title = "GET",
+                option = option,
                 isSelected = pollData.userVote == option.id,
                 hasVoted = hasVoted,
                 isClosed = isClosed,
                 isWinner = isClosed && !giveIsWinner,
-                onVote   = { onVote(option.id) },
+                onVote = { onVote(option.id) },
                 modifier = Modifier.weight(1f)
             )
         }
@@ -1641,24 +1340,24 @@ fun TradeOptionCard(
 ) {
     // accentColor drives label, icon, player name, pct text, and bar
     val accentColor = when {
-        isClosed && isWinner  -> PollsGreenBright
-        isClosed              -> PollsRedBright
-        isSelected            -> PollsAccentBlue
-        else                  -> Sage
+        isClosed && isWinner -> PollsGreenBright
+        isClosed -> PollsRedBright
+        isSelected -> PollsAccentBlue
+        else -> Sage
     }
     val cardBg = when {
-        isClosed && isWinner  -> PollsGreen.copy(alpha = 0.12f)
-        isClosed              -> PollsRed.copy(alpha = 0.08f)
-        isSelected            -> PollsAccentBlue.copy(alpha = 0.12f)
-        hasVoted              -> DarkSurfaceVariant.copy(alpha = 0.5f)
-        else                  -> DarkSurfaceVariant
+        isClosed && isWinner -> PollsGreen.copy(alpha = 0.12f)
+        isClosed -> PollsRed.copy(alpha = 0.08f)
+        isSelected -> PollsAccentBlue.copy(alpha = 0.12f)
+        hasVoted -> DarkSurfaceVariant.copy(alpha = 0.5f)
+        else -> DarkSurfaceVariant
     }
     val cardBorder = when {
-        isClosed && isWinner  -> BorderStroke(2.dp, PollsGreenBright.copy(alpha = 0.7f))
-        isClosed              -> BorderStroke(1.dp, PollsRedBright.copy(alpha = 0.4f))
-        isSelected            -> BorderStroke(2.dp, PollsAccentBlue.copy(alpha = 0.7f))
-        hasVoted              -> BorderStroke(1.dp, Sage.copy(alpha = 0.15f))
-        else                  -> BorderStroke(1.dp, PollsBorder)
+        isClosed && isWinner -> BorderStroke(2.dp, PollsGreenBright.copy(alpha = 0.7f))
+        isClosed -> BorderStroke(1.dp, PollsRedBright.copy(alpha = 0.4f))
+        isSelected -> BorderStroke(2.dp, PollsAccentBlue.copy(alpha = 0.7f))
+        hasVoted -> BorderStroke(1.dp, Sage.copy(alpha = 0.15f))
+        else -> BorderStroke(1.dp, PollsBorder)
     }
 
     Card(
@@ -1757,9 +1456,8 @@ fun TradeOptionCard(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Start/Sit Voting
-// ─────────────────────────────────────────────────────────────────────────────
+
 @Composable
 fun StartSitVotingSection(
     pollData: com.calpoly.fleecedlogin.model.PollData,
@@ -1774,11 +1472,11 @@ fun StartSitVotingSection(
     ) {
         pollData.options.forEach { option ->
             StartSitOptionCard(
-                option     = option,
+                option = option,
                 isSelected = pollData.userVote == option.id,
-                hasVoted   = hasVoted,
-                isClosed   = isClosed,
-                onVote     = { onVote(option.id) }
+                hasVoted = hasVoted,
+                isClosed = isClosed,
+                onVote = { onVote(option.id) }
             )
         }
     }
@@ -1794,13 +1492,13 @@ fun StartSitOptionCard(
 ) {
     val cardBg = when {
         isSelected -> VoteGreen.copy(alpha = 0.12f)
-        hasVoted   -> DarkSurfaceVariant.copy(alpha = 0.5f)
-        else       -> DarkSurfaceVariant
+        hasVoted -> DarkSurfaceVariant.copy(alpha = 0.5f)
+        else -> DarkSurfaceVariant
     }
     val cardBorder = when {
         isSelected -> BorderStroke(2.dp, VoteGreen.copy(alpha = 0.7f))
-        hasVoted   -> BorderStroke(1.dp, Sage.copy(alpha = 0.15f))
-        else       -> BorderStroke(1.dp, RetroPurple.copy(alpha = 0.3f))
+        hasVoted -> BorderStroke(1.dp, Sage.copy(alpha = 0.15f))
+        else -> BorderStroke(1.dp, RetroPurple.copy(alpha = 0.3f))
     }
 
     Card(
@@ -1896,48 +1594,7 @@ fun StartSitOptionCard(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Player Chip
-// ─────────────────────────────────────────────────────────────────────────────
-@Composable
-fun PlayerChip(
-    player: Player,
-    isSelected: Boolean,
-    isCompact: Boolean = false
-) {
-    Surface(
-        shape = RoundedCornerShape(6.dp),
-        color = if (isSelected) VoteGreen.copy(alpha = 0.15f) else DarkSurface,
-        border = BorderStroke(
-            1.dp,
-            if (isSelected) VoteGreen.copy(alpha = 0.4f) else Sage.copy(alpha = 0.2f)
-        )
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(
-                text = "${player.firstName.firstOrNull() ?: ""}. ${player.lastName}",
-                style = if (isCompact) MaterialTheme.typography.bodySmall else MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-                color = if (isSelected) VoteGreen else Color.White
-            )
-            Text(
-                text = player.position,
-                style = MaterialTheme.typography.labelSmall,
-                color = if (isSelected) VoteGreen.copy(alpha = 0.65f) else Sage
-            )
-        }
-    }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Post Detail Full-Screen Dialog
-// ─────────────────────────────────────────────────────────────────────────────
-// ─────────────────────────────────────────────────────────────────────────────
-
+// Post detail full-screen dialog
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostDetailDialog(
@@ -2142,9 +1799,9 @@ fun PostDetailDialog(
                                     }
 
                                     when (post.postType) {
-                                        PostType.TRADE     -> TradeVotingSection(pollData = pollData, onVote = onVote, isClosed = pollData.status == "closed")
+                                        PostType.TRADE -> TradeVotingSection(pollData = pollData, onVote = onVote, isClosed = pollData.status == "closed")
                                         PostType.START_SIT -> StartSitVotingSection(pollData = pollData, onVote = onVote, isClosed = pollData.status == "closed")
-                                        else               -> {}
+                                        else -> {}
                                     }
                                 }
 
@@ -2219,7 +1876,7 @@ fun PostDetailDialog(
                         }
                     }
 
-                    // Vote trend chart — shown for any poll with 2+ options.
+                    // Vote trend chart
                     post.pollData?.let { pollData ->
                         if (pollData.options.size >= 2) {
                             item {
@@ -2235,26 +1892,26 @@ fun PostDetailDialog(
 
                                 Surface(
                                     modifier = Modifier.fillMaxWidth(),
-                                    shape    = RoundedCornerShape(12.dp),
-                                    color    = DarkSurface,
-                                    border   = BorderStroke(1.dp, PollsBorder)
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = DarkSurface,
+                                    border = BorderStroke(1.dp, PollsBorder)
                                 ) {
                                     Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                                         Text(
-                                            text  = "VOTE TREND",
+                                            text = "VOTE TREND",
                                             style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
                                             fontWeight = FontWeight.Bold,
                                             color = PollsTextMuted
                                         )
                                         Spacer(Modifier.height(10.dp))
                                         KalshiVoteChart(
-                                            points        = voteHistory,
-                                            option1Label  = opt1Label,
-                                            option2Label  = opt2Label,
+                                            points = voteHistory,
+                                            option1Label = opt1Label,
+                                            option2Label = opt2Label,
                                             domainStartMs = chartDomainStart,
-                                            domainEndMs   = chartDomainEnd,
-                                            isLoading     = isVoteHistoryLoading,
-                                            modifier      = Modifier.fillMaxWidth()
+                                            domainEndMs = chartDomainEnd,
+                                            isLoading = isVoteHistoryLoading,
+                                            modifier = Modifier.fillMaxWidth()
                                         )
                                     }
                                 }
@@ -2407,9 +2064,7 @@ fun PostDetailDialog(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Comment Item
-// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun CommentItem(
     comment: com.calpoly.fleecedlogin.model.Comment,
@@ -2612,60 +2267,4 @@ fun CommentItem(
             }
         }
     }
-}
-
-// Keep for any remaining usages (e.g. ProfileScreen which may call CommentDialog)
-@Composable
-fun CommentDialog(
-    onDismiss: () -> Unit,
-    onSubmit: (String) -> Unit
-) {
-    var commentText by remember { mutableStateOf("") }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = DarkSurface,
-        title = {
-            Text(
-                text = "ADD COMMENT",
-                style = MaterialTheme.typography.titleMedium.copy(letterSpacing = 1.sp),
-                fontWeight = FontWeight.Bold,
-                color = RetroPurple
-            )
-        },
-        text = {
-            OutlinedTextField(
-                value = commentText,
-                onValueChange = { commentText = it },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Write your comment…", color = Sage.copy(alpha = 0.6f)) },
-                minLines = 3,
-                maxLines = 5,
-                shape = RoundedCornerShape(8.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = RetroPurple,
-                    unfocusedBorderColor = RetroPurple.copy(alpha = 0.4f),
-                    focusedContainerColor = DarkSurfaceVariant,
-                    unfocusedContainerColor = DarkSurfaceVariant,
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White
-                )
-            )
-        },
-        confirmButton = {
-            Button(
-                onClick = { if (commentText.isNotBlank()) onSubmit(commentText) },
-                enabled = commentText.isNotBlank(),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = RetroPurple,
-                    contentColor = Color.White
-                )
-            ) { Text("POST", fontWeight = FontWeight.Bold) }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel", color = Sage)
-            }
-        }
-    )
 }

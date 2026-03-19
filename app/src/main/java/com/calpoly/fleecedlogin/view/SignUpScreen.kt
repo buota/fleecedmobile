@@ -65,7 +65,7 @@ fun SignUpScreen(
         unfocusedTextColor = Color.White
     )
 
-    // ── Confirm Email State ──────────────────────────────────────────────
+    // Confirm Email State
     if (uiState is SignUpUiState.ConfirmEmail) {
         Box(
             modifier = Modifier
@@ -160,7 +160,7 @@ fun SignUpScreen(
         return
     }
 
-    // ── Sign Up Form ─────────────────────────────────────────────────────
+    // Sign Up Form
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -176,7 +176,7 @@ fun SignUpScreen(
             verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
 
-            // ── Hero Banner ──────────────────────────────────────────────
+            // Hero Banner
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -206,7 +206,7 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // ── Form Card ────────────────────────────────────────────────
+            // Form Card
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -308,7 +308,7 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // ── Sign Up Button ───────────────────────────────────────────
+            // Sign Up Button
             Button(
                 onClick = { viewModel.signUp() },
                 modifier = Modifier

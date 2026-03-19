@@ -113,7 +113,7 @@ class ProfileViewModel : ViewModel() {
             try {
                 val supabase = SupabaseClient.client
 
-                // Fetch only this user's polls
+                // Fetch only this users polls
                 val polls = supabase.postgrest.from("polls")
                     .select {
                         filter { eq("creator_id", userId) }
@@ -162,7 +162,7 @@ class ProfileViewModel : ViewModel() {
                         .associateBy { it.id }
                 } else emptyMap()
 
-                // Fetch user's votes
+                // Fetch users votes
                 val userVotes = supabase.postgrest.from("votes")
                     .select {
                         filter { eq("user_id", userId) }
@@ -365,7 +365,7 @@ class ProfileViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(comments = updatedComments)
     }
 
-    /** Fetches fresh comments for a specific post from the DB and updates state. */
+    /** Fetches fresh comments for a specific post from the DB and updates state */
     private fun parseSupabaseTimestampMs(value: String?): Long? {
         if (value.isNullOrBlank()) return null
         return runCatching { Instant.parse(value).toEpochMilli() }.getOrNull()
@@ -397,9 +397,9 @@ class ProfileViewModel : ViewModel() {
 
                 fun parseTs(str: String): Long = parseSupabaseTimestampMs(str) ?: 0L
 
-                val startTs     = post.createdAt.takeIf { it > 0L } ?: 0L
-                val pollEndTs   = pollData.resolvedAt?.takeIf { it > startTs } ?: System.currentTimeMillis()
-                val currentTs   = minOf(System.currentTimeMillis(), pollEndTs)
+                val startTs = post.createdAt.takeIf { it > 0L } ?: 0L
+                val pollEndTs = pollData.resolvedAt?.takeIf { it > startTs } ?: System.currentTimeMillis()
+                val currentTs = minOf(System.currentTimeMillis(), pollEndTs)
                 val fallbackPct = pollData.options[0].votePercentage.coerceIn(0f, 100f)
 
                 val pollOptionIds = pollData.options.map { it.id }.toSet()
@@ -426,7 +426,7 @@ class ProfileViewModel : ViewModel() {
                     }
                 }
 
-                val inRange  = snapshotPoints.filter { it.timestampMs in startTs..currentTs }
+                val inRange = snapshotPoints.filter { it.timestampMs in startTs..currentTs }
                 val startPct = inRange.firstOrNull()?.option1Pct
                     ?: snapshotPoints.firstOrNull { it.timestampMs >= startTs }?.option1Pct
                     ?: snapshotPoints.lastOrNull  { it.timestampMs <= startTs }?.option1Pct
@@ -436,7 +436,7 @@ class ProfileViewModel : ViewModel() {
                 if (startTs > 0L) history.add(VoteHistoryPoint(startTs, startPct))
                 history.addAll(inRange.filter { it.timestampMs > startTs && it.timestampMs < currentTs })
 
-                // Always end the chart at the actual current vote split.
+                // Always end the chart at the actual current vote split
                 val currentPct = fallbackPct
 
                 if (currentTs > startTs) history.add(VoteHistoryPoint(currentTs, currentPct))
@@ -451,14 +451,14 @@ class ProfileViewModel : ViewModel() {
                 updated[postId] = cleanedHistory
                 _uiState.value = _uiState.value.copy(voteHistory = updated)
             } catch (_: Exception) {
-                val post     = _userPostsList.firstOrNull { it.id == postId }
+                val post = _userPostsList.firstOrNull { it.id == postId }
                 val pollData = post?.pollData
-                val updated  = _uiState.value.voteHistory.toMutableMap()
+                val updated = _uiState.value.voteHistory.toMutableMap()
                 if (post != null && pollData != null && pollData.options.size >= 2 && post.createdAt > 0L) {
-                    val fbPct    = pollData.options[0].votePercentage.coerceIn(0f, 100f)
-                    val sPct     = if (pollData.totalVotes == 0) 50f else fbPct
-                    val startTs  = post.createdAt
-                    val nowTs    = System.currentTimeMillis()
+                    val fbPct = pollData.options[0].votePercentage.coerceIn(0f, 100f)
+                    val sPct = if (pollData.totalVotes == 0) 50f else fbPct
+                    val startTs = post.createdAt
+                    val nowTs = System.currentTimeMillis()
                     updated[postId] = listOf(VoteHistoryPoint(startTs, sPct), VoteHistoryPoint(nowTs, fbPct))
                 } else {
                     updated[postId] = emptyList()
@@ -530,7 +530,7 @@ class ProfileViewModel : ViewModel() {
         val updatedCommentsList = getCommentsForPost(postId) + newComment
         val updatedComments = _uiState.value.comments.toMutableMap().also { it[postId] = updatedCommentsList }
 
-        // Always update comments in state immediately (optimistic)
+        // Always update comments in state immediately
         _uiState.value = _uiState.value.copy(comments = updatedComments)
 
         val postIndex = _userPostsList.indexOfFirst { it.id == postId }
@@ -598,7 +598,7 @@ class ProfileViewModel : ViewModel() {
         val updatedCommentsList = getCommentsForPost(postId) + replyComment
         val updatedComments = _uiState.value.comments.toMutableMap().also { it[postId] = updatedCommentsList }
 
-        // Always update comments in state immediately (optimistic)
+        // Always update comments in state immediately
         _uiState.value = _uiState.value.copy(comments = updatedComments)
 
         val postIndex = _userPostsList.indexOfFirst { it.id == postId }

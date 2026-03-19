@@ -52,11 +52,6 @@ class PostViewModel : ViewModel() {
     fun setUserDisplayRanks(ranks: List<String>) {
         currentUserDisplayRanks = ranks
     }
-
-    /**
-     * For posts/profile: show GOAT/MVP tags only (no normal rank alongside them).
-     * If user has no special titles, show their normal rank.
-     */
     private fun getPostDisplayRanks(): List<String> {
         val special = currentUserDisplayRanks.filter { it == "GOAT" || it == "MVP" }
         return if (special.isNotEmpty()) special
@@ -94,10 +89,6 @@ class PostViewModel : ViewModel() {
 
     fun clearSearch() {
         _playerSearchResults.value = emptyList()
-    }
-
-    fun clearError() {
-        _createError.value = null
     }
 
     suspend fun createTradePost(
@@ -171,7 +162,7 @@ class PostViewModel : ViewModel() {
                 optionPlayers = options.flatMap { it.players }.distinctBy { it.id }
             )
 
-            // 1. Insert the poll
+            // Insert the poll
             supabase.postgrest.from("polls").insert(
                 DbPollInsert(
                     id = pollId,
@@ -184,7 +175,7 @@ class PostViewModel : ViewModel() {
                 )
             )
 
-            // 2. Insert poll options
+            // Insert poll options
             if (options.isNotEmpty()) {
                 val dbOptions = options.map { opt ->
                     DbPollOptionInsert(
@@ -197,7 +188,7 @@ class PostViewModel : ViewModel() {
                 }
                 supabase.postgrest.from("poll_options").insert(dbOptions)
 
-                // 3. Insert poll_option_players
+                // Insert poll_option_players
                 val playerLinks = options.flatMap { opt ->
                     opt.players.mapIndexed { idx, player ->
                         DbPollOptionPlayerInsert(

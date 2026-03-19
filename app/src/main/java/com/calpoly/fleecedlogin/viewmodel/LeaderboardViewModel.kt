@@ -79,8 +79,7 @@ class LeaderboardViewModel : ViewModel() {
     }
 
     /**
-     * Returns all display ranks for a user. A user can hold multiple titles
-     * (e.g., both MVP and GOAT if they're #1 on both seasonal and all-time).
+     * Returns all display ranks for a user, a user can hold multiple titles
      */
     fun getDisplayRanks(userId: String, points: Int): List<String> {
         val state = _uiState.value

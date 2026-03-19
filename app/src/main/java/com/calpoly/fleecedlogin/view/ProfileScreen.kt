@@ -71,7 +71,7 @@ fun ProfileScreen(
         }
     }
 
-    // ── Change Username Dialog ──────────────────────────────────────────
+    // Change Username Dialog
     if (showChangeUsernameDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -403,7 +403,7 @@ fun ProfileScreen(
         }
     }
 
-    // Fetch fresh comments + vote history from DB whenever a dialog opens
+    // Load fresh comments + vote history from DB whenever a dialog opens
     LaunchedEffect(selectedPostId) {
         selectedPostId?.let {
             viewModel.loadCommentsForPost(it)

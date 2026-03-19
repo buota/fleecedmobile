@@ -69,9 +69,9 @@ fun PostScreen(
     val createError by postViewModel.createError.collectAsState()
 
     val isPostEnabled = !isCreating && when (selectedPostType) {
-        PostType.TRADE     -> givingPlayers.isNotEmpty() && receivingPlayers.isNotEmpty()
+        PostType.TRADE -> givingPlayers.isNotEmpty() && receivingPlayers.isNotEmpty()
         PostType.START_SIT -> startSitPlayers.size == 2
-        PostType.GENERAL   -> false
+        PostType.GENERAL -> false
     }
 
     val fieldColors = OutlinedTextFieldDefaults.colors(
@@ -119,7 +119,7 @@ fun PostScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 
-                // ── Post Type Selector ───────────────────────────────────
+                // Post Type Selector
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -162,7 +162,7 @@ fun PostScreen(
                     }
                 }
 
-                // ── Trade Sections ───────────────────────────────────────
+                // Trade Sections
                 if (selectedPostType == PostType.TRADE) {
                     PlayerSection(
                         label = "GIVING AWAY",
@@ -182,7 +182,7 @@ fun PostScreen(
                     )
                 }
 
-                // ── Start/Sit Section ────────────────────────────────────
+                // Start/Sit Section
                 if (selectedPostType == PostType.START_SIT) {
                     PlayerSection(
                         label = "PLAYER OPTIONS",
@@ -196,7 +196,7 @@ fun PostScreen(
                     )
                 }
 
-                // ── Error ────────────────────────────────────────────────
+                // Error
                 createError?.let {
                     Text(
                         text = it,
@@ -205,7 +205,7 @@ fun PostScreen(
                     )
                 }
 
-                // ── POST Button ──────────────────────────────────────────
+                // Post butoton
                 Button(
                     onClick = {
                         coroutineScope.launch {
@@ -252,9 +252,7 @@ fun PostScreen(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared Player Section (Trade sides + Start/Sit)
-// ─────────────────────────────────────────────────────────────────────────────
+// Shared Player Section
 @Composable
 private fun PlayerSection(
     label: String,
@@ -320,7 +318,7 @@ private fun PlayerSection(
                 }
             }
 
-            // Search field (hidden once player limit is reached)
+            // Search field
             if (players.size < maxPlayers) OutlinedTextField(
                 value = searchQuery,
                 onValueChange = {
@@ -385,9 +383,7 @@ private fun PlayerSection(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Selected Player Row
-// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun SelectedPlayerItem(
     player: Player,
@@ -434,9 +430,7 @@ fun SelectedPlayerItem(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Player Search Result Row
-// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun PlayerSearchItem(
     player: Player,
@@ -485,85 +479,3 @@ fun PlayerSearchItem(
     )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Keep legacy composables so other callers still compile
-// ─────────────────────────────────────────────────────────────────────────────
-@Composable
-fun PostTypeChip(
-    text: String,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier
-            .height(40.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
-        color = if (isSelected) RetroPurple else DarkSurfaceVariant,
-        border = if (isSelected) null else BorderStroke(1.dp, RetroPurple.copy(alpha = 0.3f))
-    ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = text.uppercase(),
-                style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 0.5.sp),
-                fontWeight = FontWeight.Bold,
-                color = if (isSelected) Color.White else Sage
-            )
-        }
-    }
-}
-
-@Composable
-fun TradeSection(
-    title: String,
-    players: List<Player>,
-    onPlayersChanged: (List<Player>) -> Unit,
-    viewModel: PostViewModel
-) {
-    val fieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = RetroPurple,
-        unfocusedBorderColor = RetroPurple.copy(alpha = 0.4f),
-        focusedLabelColor = RetroPurple,
-        unfocusedLabelColor = Sage,
-        focusedContainerColor = DarkSurfaceVariant,
-        unfocusedContainerColor = DarkSurfaceVariant,
-        focusedTextColor = Color.White,
-        unfocusedTextColor = Color.White
-    )
-    PlayerSection(
-        label = title.uppercase(),
-        accentColor = LightPurple,
-        players = players,
-        onPlayersChanged = onPlayersChanged,
-        viewModel = viewModel,
-        fieldColors = fieldColors
-    )
-}
-
-@Composable
-fun StartSitSection(
-    players: List<Player>,
-    onPlayersChanged: (List<Player>) -> Unit,
-    viewModel: PostViewModel
-) {
-    val fieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = RetroPurple,
-        unfocusedBorderColor = RetroPurple.copy(alpha = 0.4f),
-        focusedLabelColor = RetroPurple,
-        unfocusedLabelColor = Sage,
-        focusedContainerColor = DarkSurfaceVariant,
-        unfocusedContainerColor = DarkSurfaceVariant,
-        focusedTextColor = Color.White,
-        unfocusedTextColor = Color.White
-    )
-    PlayerSection(
-        label = "PLAYER OPTIONS",
-        accentColor = RetroPurple,
-        hint = "Add at least 2 players",
-        players = players,
-        onPlayersChanged = onPlayersChanged,
-        viewModel = viewModel,
-        fieldColors = fieldColors
-    )
-}

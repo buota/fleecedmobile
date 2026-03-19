@@ -3,8 +3,7 @@ package com.calpoly.fleecedlogin.model
 import androidx.compose.ui.graphics.Color
 
 /**
- * brNFL primary team colors.
- * Accepts common aliases (abbreviation, mascot, city, full name).
+ * NFL team colors for jersey
  */
 object NflTeamColors {
     private val primaryByAbbreviation = mapOf(

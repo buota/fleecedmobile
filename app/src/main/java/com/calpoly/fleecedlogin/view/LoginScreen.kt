@@ -61,7 +61,7 @@ fun LoginScreen(
             verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
 
-            // ── Hero Banner ──────────────────────────────────────────────
+            // Hero Banner
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -94,7 +94,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(36.dp))
 
-            // ── Form Card ────────────────────────────────────────────────
+            // Form Card
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -177,7 +177,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // ── Login Button ─────────────────────────────────────────────
+            // Login Button
             Button(
                 onClick = { viewModel.login() },
                 modifier = Modifier

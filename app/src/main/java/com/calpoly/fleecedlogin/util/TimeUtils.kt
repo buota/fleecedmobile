@@ -5,7 +5,7 @@ import java.util.TimeZone
 
 /**
  * Returns true if today falls within the 2025 NFL regular season
- * (Week 1 = Sept 4, 2025 through end of Week 18 ≈ Jan 5, 2026).
+ * (Week 1 = Sept 4, 2025 through end of Week 18)
  */
 fun isNflInSeason(): Boolean {
     val now = Calendar.getInstance()
@@ -21,7 +21,7 @@ fun isNflInSeason(): Boolean {
     return now.timeInMillis in seasonStart.timeInMillis..seasonEnd.timeInMillis
 }
 
-/** Returns the current NFL regular-season week (1–18), clamped to that range. */
+/** Returns the current NFL regular-season week (1–18) */
 fun getCurrentNflWeek(): Int {
     // NFL 2025 regular season: Week 1 began Thursday Sept 4, 2025
     val seasonStart = Calendar.getInstance(TimeZone.getTimeZone("America/New_York")).apply {

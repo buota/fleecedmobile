@@ -29,14 +29,14 @@ data class HomeUiState(
     val weekFilter: FeedWeekFilter = FeedWeekFilter.ALL_WEEKS,
     val sortOrder: FeedSortOrder  = FeedSortOrder.TOP_RATED,
     val postTypeFilter: PostType  = PostType.START_SIT,
-    // Posts matching the current TYPE regardless of week — used to tell "week-filtered empty"
-    // apart from "no posts of this type at all".
+    // Posts matching the current type regardless of week
+    // apart from "no posts of this type at all"
     val typePostsCount: Int = 0,
-    // Total posts in _postsList across all types and weeks — 0 means nothing loaded from DB yet.
+    // Total posts in _postsList across all types and weeks
     val totalPostsCount: Int = 0,
-    // Vote trend history per poll id (lazy-loaded when detail dialog opens)
+    // Vote trend history per poll id
     val voteHistory: Map<String, List<VoteHistoryPoint>> = emptyMap(),
-    // Poll ids currently being fetched — drives the chart loading skeleton
+    // Poll ids currently being fetched
     val voteHistoryLoadingIds: Set<String> = emptySet()
 )
 
@@ -45,7 +45,6 @@ class HomeViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    // Source-of-truth backing list — all loaded posts, unfiltered.
     private val _postsList = mutableListOf<Post>()
 
     private var profileViewModel: ProfileViewModel? = null
@@ -59,11 +58,11 @@ class HomeViewModel : ViewModel() {
         loadPostsFromDb()
     }
 
-    // ── Filter / sort ──────────────────────────────────────────────────────────
+    // Filter / sort
 
     companion object {
         private const val TAG = "HomeViewModel"
-        private const val BOOST_WEIGHT   = 2.0
+        private const val BOOST_WEIGHT = 2.0
         private const val MILLIS_PER_HOUR = 3_600_000.0
     }
 
@@ -83,31 +82,31 @@ class HomeViewModel : ViewModel() {
             }.getOrNull()
     }
 
-    /** Derives the display list from [_postsList] by applying type → sort. */
+    /** Derives the display list from [_postsList] by applying type → sort */
     private fun getFilteredAndSortedPosts(
-        postTypeFilter: PostType       = _uiState.value.postTypeFilter,
-        weekFilter:     FeedWeekFilter = _uiState.value.weekFilter,
-        sortOrder:      FeedSortOrder  = _uiState.value.sortOrder
+        postTypeFilter: PostType = _uiState.value.postTypeFilter,
+        weekFilter: FeedWeekFilter = _uiState.value.weekFilter,
+        sortOrder: FeedSortOrder  = _uiState.value.sortOrder
     ): List<Post> {
         val byType = _postsList.filter { it.postType == postTypeFilter }
         return when (sortOrder) {
-            FeedSortOrder.TOP_RATED    -> byType.sortedByDescending { feedSortScore(it) }
+            FeedSortOrder.TOP_RATED -> byType.sortedByDescending { feedSortScore(it) }
             FeedSortOrder.NEWEST_FIRST -> byType.sortedByDescending { it.createdAt }
         }
     }
 
-    /** Posts matching the given type, week-agnostic. */
+    /** Posts matching the given type */
     private fun countByType(type: PostType = _uiState.value.postTypeFilter): Int =
         _postsList.count { it.postType == type }
 
     /**
-     * Re-applies the current filters atomically and updates [uiState].
-     * Called after every DB load or in-place mutation.
+     * Re-applies the current filters atomically and updates [uiState]
+     * Called after every DB load or in-place mutation
      */
     fun loadPosts() {
         _uiState.value = _uiState.value.copy(
-            posts           = getFilteredAndSortedPosts(),
-            typePostsCount  = countByType(),
+            posts = getFilteredAndSortedPosts(),
+            typePostsCount = countByType(),
             totalPostsCount = _postsList.size
         )
     }
@@ -118,15 +117,15 @@ class HomeViewModel : ViewModel() {
         sortOrder: FeedSortOrder = _uiState.value.sortOrder
     ) {
         _uiState.value = _uiState.value.copy(
-            postTypeFilter  = postTypeFilter,
-            weekFilter      = weekFilter,
-            sortOrder       = sortOrder,
-            posts           = getFilteredAndSortedPosts(
+            postTypeFilter = postTypeFilter,
+            weekFilter = weekFilter,
+            sortOrder = sortOrder,
+            posts = getFilteredAndSortedPosts(
                 postTypeFilter = postTypeFilter,
                 weekFilter = weekFilter,
                 sortOrder = sortOrder
             ),
-            typePostsCount  = countByType(postTypeFilter),
+            typePostsCount = countByType(postTypeFilter),
             totalPostsCount = _postsList.size
         )
     }
@@ -136,24 +135,15 @@ class HomeViewModel : ViewModel() {
         applyFilters(postTypeFilter = type)
     }
 
-    fun setWeekFilter(filter: FeedWeekFilter) {
-        if (_uiState.value.weekFilter == filter) return
-        applyFilters(weekFilter = filter)
-    }
-
     fun setSortOrder(order: FeedSortOrder) {
         if (_uiState.value.sortOrder == order) return
         applyFilters(sortOrder = order)
     }
 
-    // ── Data access ────────────────────────────────────────────────────────────
-
-    /** Looks up a post directly from the backing list, bypassing any active filter.
-     *  Used by PostDetailDialog so it stays open even when the user changes filters. */
+    // Data access
     fun getPostById(postId: String): Post? = _postsList.firstOrNull { it.id == postId }
 
-    // ── DB load ────────────────────────────────────────────────────────────────
-
+    // DB load
     private fun loadPostsFromDb() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, loadError = null)
@@ -255,12 +245,12 @@ class HomeViewModel : ViewModel() {
                     emptyList()
                 }
 
-                val upvotesMap    = mutableMapOf<String, Int>()
-                val downvotesMap  = mutableMapOf<String, Int>()
+                val upvotesMap = mutableMapOf<String, Int>()
+                val downvotesMap = mutableMapOf<String, Int>()
                 val userReactionMap = mutableMapOf<String, String>() // pollId -> reaction_type
                 for (reaction in pollReactions) {
                     when (reaction.reactionType) {
-                        "upvote"   -> upvotesMap[reaction.targetId]   = (upvotesMap[reaction.targetId]   ?: 0) + 1
+                        "upvote" -> upvotesMap[reaction.targetId] = (upvotesMap[reaction.targetId]   ?: 0) + 1
                         "downvote" -> downvotesMap[reaction.targetId] = (downvotesMap[reaction.targetId] ?: 0) + 1
                     }
                     if (reaction.userId == userId) {
@@ -270,12 +260,12 @@ class HomeViewModel : ViewModel() {
 
                 // Build Post objects
                 val posts = polls.map { poll ->
-                    val options    = allOptions.filter { it.pollId == poll.id }.sortedBy { it.sortOrder ?: Int.MAX_VALUE }
+                    val options = allOptions.filter { it.pollId == poll.id }.sortedBy { it.sortOrder ?: Int.MAX_VALUE }
                     val totalVotes = options.sumOf { it.voteCount }
-                    val userVote   = userVotes[poll.id]?.optionId
-                    val creatorProfile  = userProfiles[poll.creatorId]
+                    val userVote = userVotes[poll.id]?.optionId
+                    val creatorProfile = userProfiles[poll.creatorId]
                     val creatorUsername = creatorProfile?.username ?: "Unknown"
-                    val creatorPoints   = creatorProfile?.totalPoints ?: 0
+                    val creatorPoints = creatorProfile?.totalPoints ?: 0
 
                     val postType = when (poll.pollType) {
                         "trade" -> PostType.TRADE
@@ -287,7 +277,7 @@ class HomeViewModel : ViewModel() {
                         val resolvedAtMillis = parseSupabaseTimestampMs(poll.resolvedAt)
 
                         PollData(
-                            id     = poll.id,
+                            id = poll.id,
                             postId = poll.id,
                             options = options.map { opt ->
                                 val optionPlayerLinks = allOptionPlayers
@@ -302,21 +292,21 @@ class HomeViewModel : ViewModel() {
                                     else -> null
                                 }
                                 PollOption(
-                                    id             = opt.id,
-                                    pollId         = poll.id,
-                                    players        = players,
-                                    side           = side,
-                                    voteCount      = opt.voteCount,
+                                    id = opt.id,
+                                    pollId = poll.id,
+                                    players = players,
+                                    side = side,
+                                    voteCount = opt.voteCount,
                                     votePercentage = if (totalVotes > 0) (opt.voteCount.toFloat() / totalVotes) * 100 else 0f
                                 )
                             },
-                            totalVotes      = totalVotes,
-                            userVote        = userVote,
+                            totalVotes = totalVotes,
+                            userVote = userVote,
                             correctOptionId = poll.winningOptionId,
-                            status          = poll.status,
-                            resolvedAt      = resolvedAtMillis,
-                            player1Points   = poll.resolutionMetadata?.player1Points,
-                            player2Points   = poll.resolutionMetadata?.player2Points
+                            status = poll.status,
+                            resolvedAt = resolvedAtMillis,
+                            player1Points = poll.resolutionMetadata?.player1Points,
+                            player2Points = poll.resolutionMetadata?.player2Points
                         )
                     } else null
 
@@ -324,27 +314,27 @@ class HomeViewModel : ViewModel() {
                     val createdAtMillis = parseSupabaseTimestampMs(poll.createdAt) ?: 0L
 
                     val userVoteType = when (userReactionMap[poll.id]) {
-                        "upvote"   -> VoteType.UP
+                        "upvote" -> VoteType.UP
                         "downvote" -> VoteType.DOWN
-                        else       -> null
+                        else -> null
                     }
 
                     Post(
-                        id           = poll.id,
-                        userId       = poll.creatorId,
-                        username     = creatorUsername,
-                        userRanks    = listOf(getRankForPoints(creatorPoints).title),
-                        title        = "",
-                        content      = poll.description ?: "",
-                        timestamp    = createdAtMillis.toString(),
-                        createdAt    = createdAtMillis,
-                        upvotes      = upvotesMap[poll.id]   ?: 0,
-                        downvotes    = downvotesMap[poll.id] ?: 0,
+                        id = poll.id,
+                        userId = poll.creatorId,
+                        username = creatorUsername,
+                        userRanks = listOf(getRankForPoints(creatorPoints).title),
+                        title = "",
+                        content = poll.description ?: "",
+                        timestamp = createdAtMillis.toString(),
+                        createdAt = createdAtMillis,
+                        upvotes = upvotesMap[poll.id]   ?: 0,
+                        downvotes = downvotesMap[poll.id] ?: 0,
                         userVoteType = userVoteType,
                         commentCount = commentCountMap[poll.id] ?: 0,
-                        postType     = postType,
-                        pollData     = pollData,
-                        weekNumber   = poll.weekNumber
+                        postType = postType,
+                        pollData = pollData,
+                        weekNumber = poll.weekNumber
                     )
                 }
 
@@ -356,7 +346,7 @@ class HomeViewModel : ViewModel() {
                 _postsList.clear()
                 _postsList.addAll(posts)
 
-                // Snapshot current vote counts in the background — never blocks the feed.
+                // Snapshot current vote counts in the background
                 viewModelScope.launch { writeVoteSnapshots(posts) }
 
                 // Build comments map
@@ -371,14 +361,14 @@ class HomeViewModel : ViewModel() {
                             }.parse(dbc.createdAt.substringBefore("+").substringBefore("."))?.time ?: 0L
                         } catch (e: Exception) { 0L }
                         Comment(
-                            id              = dbc.id,
-                            postId          = dbc.pollId,
-                            userId          = dbc.userId,
-                            username        = commenterProfile?.username ?: "Unknown",
-                            content         = dbc.content,
-                            createdAt       = createdMillis,
-                            likes           = dbc.upvoteCount,
-                            isLiked         = false,
+                            id = dbc.id,
+                            postId = dbc.pollId,
+                            userId = dbc.userId,
+                            username = commenterProfile?.username ?: "Unknown",
+                            content = dbc.content,
+                            createdAt = createdMillis,
+                            likes = dbc.upvoteCount,
+                            isLiked = false,
                             parentCommentId = dbc.parentCommentId
                         )
                     }
@@ -387,7 +377,7 @@ class HomeViewModel : ViewModel() {
 
                 loadPosts()
                 _uiState.value = _uiState.value.copy(
-                    comments  = commentsMap,
+                    comments = commentsMap,
                     isLoading = false,
                     loadError = null
                 )
@@ -401,19 +391,11 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    // ── Mutations ──────────────────────────────────────────────────────────────
+    // Mutations
 
     fun addPost(post: Post) {
         _postsList.add(0, post)
         loadPosts()
-    }
-
-    fun updatePost(updatedPost: Post) {
-        val idx = _postsList.indexOfFirst { it.id == updatedPost.id }
-        if (idx != -1) {
-            _postsList[idx] = updatedPost
-            loadPosts()
-        }
     }
 
     fun updatePostInList(updatedPost: Post) {
@@ -437,8 +419,8 @@ class HomeViewModel : ViewModel() {
                     val updatedOptions = pollData.options.map { option ->
                         when {
                             option.id == previousVote -> option.copy(voteCount = (option.voteCount - 1).coerceAtLeast(0))
-                            option.id == optionId     -> option.copy(voteCount = option.voteCount + 1)
-                            else                      -> option
+                            option.id == optionId -> option.copy(voteCount = option.voteCount + 1)
+                            else -> option
                         }
                     }
 
@@ -453,9 +435,9 @@ class HomeViewModel : ViewModel() {
                     }
 
                     val updatedPollData = pollData.copy(
-                        options    = optionsWithPercentages,
+                        options = optionsWithPercentages,
                         totalVotes = newTotalVotes,
-                        userVote   = optionId
+                        userVote = optionId
                     )
 
                     val updatedPost = post.copy(pollData = updatedPollData)
@@ -535,26 +517,21 @@ class HomeViewModel : ViewModel() {
         loadPostsFromDb()
     }
 
-    /**
-     * Inserts one snapshot row per poll option into [poll_votes_snapshots] at the current
-     * timestamp.  Each app load / refresh adds a new data point, building up the historical
-     * trend the Kalshi-style chart reads.
-     */
     private suspend fun writeVoteSnapshots(posts: List<Post>) {
         val snapshotAt = Instant.ofEpochMilli(System.currentTimeMillis()).toString()
 
         val rows = posts.flatMap { post ->
             val pollData = post.pollData ?: return@flatMap emptyList()
-            // Skip polls with no votes — a zero-count row adds no useful chart information.
+            // Skip polls with no votes — a zero-count row adds no useful chart information
             if (pollData.totalVotes <= 0) return@flatMap emptyList()
             if (pollData.options.size < 2) return@flatMap emptyList()
 
             pollData.options.map { option ->
                 DbVoteSnapshotInsert(
-                    id         = UUID.randomUUID().toString(),
-                    pollId     = post.id,
-                    optionId   = option.id,
-                    voteCount  = option.voteCount,
+                    id = UUID.randomUUID().toString(),
+                    pollId = post.id,
+                    optionId = option.id,
+                    voteCount = option.voteCount,
                     snapshotAt = snapshotAt
                 )
             }
@@ -571,13 +548,9 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    /** Fetches vote snapshots for [postId] from [poll_votes_snapshots] and builds a time-series
-     *  for the Kalshi-style chart.
-     *  X-axis: poll creation time (left) → poll end/now (right).
-     *  Y-axis: option 1 vote percentage (0–100 %). */
     fun loadVoteHistory(postId: String) {
         viewModelScope.launch {
-            // Signal loading started so the chart shows a skeleton immediately.
+            // Signal loading started so the chart shows a skeleton immediately
             _uiState.value = _uiState.value.copy(
                 voteHistoryLoadingIds = _uiState.value.voteHistoryLoadingIds + postId
             )
@@ -596,13 +569,13 @@ class HomeViewModel : ViewModel() {
 
                 fun parseTs(str: String): Long = parseSupabaseTimestampMs(str) ?: 0L
 
-                val startTs     = post.createdAt.takeIf { it > 0L } ?: 0L
-                val pollEndTs   = pollData.resolvedAt?.takeIf { it > startTs } ?: System.currentTimeMillis()
-                val currentTs   = minOf(System.currentTimeMillis(), pollEndTs)
+                val startTs = post.createdAt.takeIf { it > 0L } ?: 0L
+                val pollEndTs = pollData.resolvedAt?.takeIf { it > startTs } ?: System.currentTimeMillis()
+                val currentTs = minOf(System.currentTimeMillis(), pollEndTs)
                 val fallbackPct = pollData.options[0].votePercentage.coerceIn(0f, 100f)
 
                 // Group snapshot rows by timestamp and carry counts forward so every point
-                // reflects cumulative totals up to that moment.
+                // reflects cumulative totals up to that moment
                 val pollOptionIds = pollData.options.map { it.id }.toSet()
                 val snapshotsByTs = snapshots
                     .groupBy { parseTs(it.snapshotAt) }
@@ -638,7 +611,7 @@ class HomeViewModel : ViewModel() {
                 history.addAll(inRange.filter { it.timestampMs > startTs && it.timestampMs < currentTs })
 
                 // Always end the chart at the actual current vote split so the
-                // displayed percentage matches what the user sees on the post.
+                // displayed percentage matches what the user sees on the post
                 val currentPct = fallbackPct
 
                 if (currentTs > startTs) history.add(VoteHistoryPoint(currentTs, currentPct))
@@ -653,16 +626,16 @@ class HomeViewModel : ViewModel() {
                 updated[postId] = cleanedHistory   // empty list = loaded with no usable data
                 _uiState.value = _uiState.value.copy(voteHistory = updated)
             } catch (_: Exception) {
-                // Build a minimal 2-point history from existing poll data so the
-                // chart still renders even when poll_votes_snapshots has no rows.
-                val post     = _postsList.firstOrNull { it.id == postId }
+                // Build 2-point history from existing poll data so the
+                // chart still renders even when poll_votes_snapshots has no rows
+                val post = _postsList.firstOrNull { it.id == postId }
                 val pollData = post?.pollData
-                val updated  = _uiState.value.voteHistory.toMutableMap()
+                val updated = _uiState.value.voteHistory.toMutableMap()
                 if (post != null && pollData != null && pollData.options.size >= 2 && post.createdAt > 0L) {
-                    val fbPct    = pollData.options[0].votePercentage.coerceIn(0f, 100f)
-                    val sPct     = if (pollData.totalVotes == 0) 50f else fbPct
-                    val startTs  = post.createdAt
-                    val nowTs    = System.currentTimeMillis()
+                    val fbPct = pollData.options[0].votePercentage.coerceIn(0f, 100f)
+                    val sPct = if (pollData.totalVotes == 0) 50f else fbPct
+                    val startTs = post.createdAt
+                    val nowTs = System.currentTimeMillis()
                     updated[postId] = listOf(VoteHistoryPoint(startTs, sPct), VoteHistoryPoint(nowTs, fbPct))
                 } else {
                     updated[postId] = emptyList()
@@ -680,7 +653,7 @@ class HomeViewModel : ViewModel() {
         val userId = _uiState.value.user?.id ?: return
         val postIndex = _postsList.indexOfFirst { it.id == postId }
         if (postIndex != -1) {
-            val post         = _postsList[postIndex]
+            val post = _postsList[postIndex]
             val previousVote = post.userVoteType
 
             val updatedPost = when {
@@ -710,7 +683,7 @@ class HomeViewModel : ViewModel() {
 
             viewModelScope.launch {
                 try {
-                    val supabase     = SupabaseClient.client
+                    val supabase = SupabaseClient.client
                     val reactionType = when (voteType) {
                         VoteType.UP   -> "upvote"
                         VoteType.DOWN -> "downvote"
@@ -737,9 +710,9 @@ class HomeViewModel : ViewModel() {
                     } else {
                         supabase.postgrest.from("reactions").insert(
                             DbReactionUpsert(
-                                userId       = userId,
-                                targetType   = "poll",
-                                targetId     = postId,
+                                userId = userId,
+                                targetType = "poll",
+                                targetId = postId,
                                 reactionType = reactionType
                             )
                         )
@@ -749,8 +722,7 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    // ── Comments ───────────────────────────────────────────────────────────────
-
+    // Comments
     fun getCommentsForPost(postId: String): List<Comment> =
         _uiState.value.comments[postId] ?: emptyList()
 
@@ -760,11 +732,11 @@ class HomeViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(comments = updatedComments)
     }
 
-    /** Fetches fresh comments for a specific post from the DB and updates state. */
+    /** Fetches fresh comments for a specific post from the DB and updates state */
     fun loadCommentsForPost(postId: String) {
         viewModelScope.launch {
             try {
-                val supabase   = SupabaseClient.client
+                val supabase = SupabaseClient.client
                 val dbComments = supabase.postgrest.from("comments")
                     .select { filter { eq("poll_id", postId) } }
                     .decodeList<DbComment>()
@@ -782,14 +754,14 @@ class HomeViewModel : ViewModel() {
                         sdf.parse(dbc.createdAt.substringBefore("+").substringBefore("."))?.time ?: 0L
                     } catch (_: Exception) { 0L }
                     Comment(
-                        id              = dbc.id,
-                        postId          = dbc.pollId,
-                        userId          = dbc.userId,
-                        username        = userProfiles[dbc.userId]?.username ?: "Unknown",
-                        content         = dbc.content,
-                        createdAt       = createdMillis,
-                        likes           = dbc.upvoteCount,
-                        isLiked         = false,
+                        id = dbc.id,
+                        postId = dbc.pollId,
+                        userId = dbc.userId,
+                        username = userProfiles[dbc.userId]?.username ?: "Unknown",
+                        content = dbc.content,
+                        createdAt = createdMillis,
+                        likes = dbc.upvoteCount,
+                        isLiked = false,
                         parentCommentId = dbc.parentCommentId
                     )
                 }.sortedBy { it.createdAt }
@@ -807,19 +779,19 @@ class HomeViewModel : ViewModel() {
 
         val commentId = java.util.UUID.randomUUID().toString()
         val newComment = Comment(
-            id              = commentId,
-            postId          = postId,
-            userId          = currentUser.id,
-            username        = currentUser.username,
-            content         = commentText,
-            createdAt       = System.currentTimeMillis(),
-            likes           = 0,
-            isLiked         = false,
+            id = commentId,
+            postId = postId,
+            userId = currentUser.id,
+            username = currentUser.username,
+            content = commentText,
+            createdAt = System.currentTimeMillis(),
+            likes = 0,
+            isLiked = false,
             parentCommentId = null
         )
 
         val updatedCommentsList = (_uiState.value.comments[postId] ?: emptyList()) + newComment
-        val updatedComments     = _uiState.value.comments.toMutableMap().also { it[postId] = updatedCommentsList }
+        val updatedComments = _uiState.value.comments.toMutableMap().also { it[postId] = updatedCommentsList }
 
         _uiState.value = _uiState.value.copy(comments = updatedComments)
 
@@ -836,9 +808,9 @@ class HomeViewModel : ViewModel() {
             try {
                 SupabaseClient.client.postgrest.from("comments").insert(
                     DbCommentInsert(
-                        id      = commentId,
-                        pollId  = postId,
-                        userId  = currentUser.id,
+                        id = commentId,
+                        pollId = postId,
+                        userId = currentUser.id,
                         content = commentText
                     )
                 )
@@ -848,10 +820,10 @@ class HomeViewModel : ViewModel() {
 
     fun likeComment(postId: String, commentId: String) {
         val currentComments = _uiState.value.comments[postId] ?: return
-        val commentIndex    = currentComments.indexOfFirst { it.id == commentId }
+        val commentIndex = currentComments.indexOfFirst { it.id == commentId }
 
         if (commentIndex != -1) {
-            val comment        = currentComments[commentIndex]
+            val comment = currentComments[commentIndex]
             val updatedComment = if (comment.isLiked)
                 comment.copy(isLiked = false, likes = (comment.likes - 1).coerceAtLeast(0))
             else
@@ -871,21 +843,21 @@ class HomeViewModel : ViewModel() {
     fun replyToComment(postId: String, parentCommentId: String, replyText: String) {
         val currentUser = _uiState.value.user ?: return
 
-        val replyId    = java.util.UUID.randomUUID().toString()
+        val replyId = java.util.UUID.randomUUID().toString()
         val replyComment = Comment(
-            id              = replyId,
-            postId          = postId,
-            userId          = currentUser.id,
-            username        = currentUser.username,
-            content         = replyText,
-            createdAt       = System.currentTimeMillis(),
-            likes           = 0,
-            isLiked         = false,
+            id = replyId,
+            postId = postId,
+            userId = currentUser.id,
+            username = currentUser.username,
+            content = replyText,
+            createdAt = System.currentTimeMillis(),
+            likes = 0,
+            isLiked = false,
             parentCommentId = parentCommentId
         )
 
         val updatedCommentsList = (_uiState.value.comments[postId] ?: emptyList()) + replyComment
-        val updatedComments     = _uiState.value.comments.toMutableMap().also { it[postId] = updatedCommentsList }
+        val updatedComments = _uiState.value.comments.toMutableMap().also { it[postId] = updatedCommentsList }
 
         _uiState.value = _uiState.value.copy(comments = updatedComments)
 
@@ -902,11 +874,11 @@ class HomeViewModel : ViewModel() {
             try {
                 SupabaseClient.client.postgrest.from("comments").insert(
                     DbCommentInsert(
-                        id              = replyId,
-                        pollId          = postId,
-                        userId          = currentUser.id,
+                        id = replyId,
+                        pollId = postId,
+                        userId = currentUser.id,
                         parentCommentId = parentCommentId,
-                        content         = replyText
+                        content = replyText
                     )
                 )
             } catch (_: Exception) { }
